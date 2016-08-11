@@ -1,6 +1,6 @@
 
-/* Copyright (c) 2005-2014, Stefan Eilemann <eile@equalizergraphics.com>
- *               2011-2012, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2005-2016, Stefan Eilemann <eile@equalizergraphics.com>
+ *                          Daniel Nachbaur <danielnachbaur@gmail.com>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -288,7 +288,7 @@ public:
      * @param os The output stream.
      * @version 1.0
      */
-    virtual void getInstanceData( DataOStream& os ) = 0;
+    virtual void getInstanceData( DataOStream& os LB_UNUSED ) {}
 
     /**
      * Deserialize the instance data.
@@ -299,7 +299,7 @@ public:
      * @param is the input stream.
      * @version 1.0
      */
-    virtual void applyInstanceData( DataIStream& is ) = 0;
+    virtual void applyInstanceData( DataIStream& is LB_UNUSED ) {}
 
     /**
      * Serialize the modifications since the last call to commit().
@@ -423,7 +423,7 @@ public:
     void transfer( Object* from );
 
     void applyMapData( const uint128_t& version ); //!< @internal
-    void sendInstanceData( Nodes& nodes ); //!< @internal
+    void sendInstanceData( const Nodes& nodes ); //!< @internal
     //@}
 
 protected:
