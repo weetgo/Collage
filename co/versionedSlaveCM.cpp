@@ -200,12 +200,13 @@ void VersionedSlaveCM::applyMapData( const uint128_t& version )
             _version = is->getVersion();
 
             LBASSERT( _version != VERSION_INVALID );
-            LBASSERTINFO( !is->hasData(),
+//oleg
+/*            LBASSERTINFO( !is->hasData(),
                           lunchbox::className( _object ) <<
                           " did not unpack all data, " <<
                           is->getRemainingBufferSize() << " bytes, " <<
                           is->nRemainingBuffers() << " buffer(s)" );
-
+*/
             _releaseStream( is );
 #if 0
             LBLOG( LOG_OBJECTS ) << "Mapped initial data of " << _object
