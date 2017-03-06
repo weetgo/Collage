@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2012, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2012-2017, Daniel Nachbaur <danielnachbaur@gmail.com>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -20,25 +20,26 @@
 #ifndef CO_OBJECTDATACOMMAND_H
 #define CO_OBJECTDATACOMMAND_H
 
-#include <co/objectICommand.h>   // base class
-
+#include <co/objectICommand.h> // base class
 
 namespace co
 {
-
-namespace detail { class ObjectDataICommand; }
+namespace detail
+{
+class ObjectDataICommand;
+}
 
 /** @internal A command specialization for object data. */
 class ObjectDataICommand : public ObjectICommand
 {
 public:
     // cppcheck-suppress noExplicitConstructor
-    CO_API ObjectDataICommand( const ICommand& command );
+    CO_API ObjectDataICommand(const ICommand& command);
 
-    CO_API ObjectDataICommand( LocalNodePtr local, NodePtr remote,
-                              ConstBufferPtr buffer, const bool swap );
+    CO_API ObjectDataICommand(LocalNodePtr local, NodePtr remote,
+                              ConstBufferPtr buffer);
 
-    ObjectDataICommand( const ObjectDataICommand& rhs );
+    ObjectDataICommand(const ObjectDataICommand& rhs);
 
     CO_API ~ObjectDataICommand();
 
@@ -52,7 +53,7 @@ public:
     CO_API uint64_t getDataSize() const;
 
     /** @return the compressor used for the object data. */
-    CO_API uint32_t getCompressor() const;
+    CO_API CompressorInfo getCompressorInfo() const;
 
     /** @return the number of chunks containing the object data. */
     CO_API uint32_t getChunks() const;
@@ -62,14 +63,13 @@ public:
 
 private:
     ObjectDataICommand();
-    ObjectDataICommand& operator = ( const ObjectDataICommand& );
+    ObjectDataICommand& operator=(const ObjectDataICommand&);
     detail::ObjectDataICommand* const _impl;
 
     void _init();
 };
 
-CO_API std::ostream& operator << ( std::ostream& os, const ObjectDataICommand& );
-
+CO_API std::ostream& operator<<(std::ostream& os, const ObjectDataICommand&);
 }
 
-#endif //CO_OBJECTDATACOMMAND_H
+#endif // CO_OBJECTDATACOMMAND_H

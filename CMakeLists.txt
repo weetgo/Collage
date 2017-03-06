@@ -1,10 +1,10 @@
 
-# Copyright (c) 2010-2016 Daniel Pfeifer <daniel@pfeifer-mail.de>
+# Copyright (c) 2010-2017 Daniel Pfeifer <daniel@pfeifer-mail.de>
 #                         Stefan Eilemann <eile@eyescale.ch>
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(Collage VERSION 1.6.0)
-set(Collage_VERSION_ABI 6)
+project(Collage VERSION 1.7.0)
+set(Collage_VERSION_ABI 7)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
   ${CMAKE_SOURCE_DIR}/CMake/common)
@@ -35,6 +35,7 @@ common_find_package(Boost REQUIRED COMPONENTS system regex date_time
   serialization program_options thread)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(OFED)
+common_find_package(OpenMP)
 common_find_package(Pression REQUIRED)
 common_find_package(Servus REQUIRED)
 common_find_package(UDT)
@@ -45,7 +46,7 @@ if(UDT_FOUND AND NOT UDT_HAS_RCVDATA)
 endif()
 
 if(COLLAGE_AGGRESSIVE_CACHING)
-  list(APPEND COMMON_FIND_PACKAGE_DEFINES COLLAGE_AGGRESSIVE_CACHING)
+  list(APPEND COMMON_FIND_PACKAGE_DEFINES CO_AGGRESSIVE_CACHING)
 endif()
 
 if(COLLAGE_BUILD_V2_API)

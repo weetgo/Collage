@@ -1,5 +1,5 @@
-/* Copyright (c) 2006-2014, Stefan Eilemann <eile@equalizergraphics.com>
-* 2012, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2006-2017, Stefan Eilemann <eile@equalizergraphics.com>
+*                           Daniel Nachbaur <danielnachbaur@gmail.com>
 *
 * This file is part of Collage <https://github.com/Eyescale/Collage>
 *
@@ -59,12 +59,9 @@
 * The following Figure depicts the UML class diagram of the major Collage
 * classes:
 *
-* <img src="http://www.equalizergraphics.com/documents/design/images/collage.png">
+* <img
+src="http://www.equalizergraphics.com/documents/design/images/collage.png">
 
 */
-#ifdef CO_IGNORE_ENDIANNESS
-namespace lunchbox
-{ template< class T > inline void byteswap( T& value ) { /*NOP*/ }}
-#endif
 
 #endif // CO_FEATURES_H

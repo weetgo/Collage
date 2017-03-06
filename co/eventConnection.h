@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2010-2014, Stefan Eilemann <eile@equalizergraphics.com>
+/* Copyright (c) 2010-2017, Stefan Eilemann <eile@equalizergraphics.com>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -20,56 +20,58 @@
 #ifndef CO_EVENT_CONNECTION_H
 #define CO_EVENT_CONNECTION_H
 
-#include <co/connection.h>   // base class
+#include <co/connection.h> // base class
 
 #include "buffer.h"
 #include "pipeConnection.h"
 
-#include <lunchbox/lock.h>
-
 namespace co
 {
-    /**
-     * A connection signalling an event.
-     *
-     * The connection is only useful to signal something to a ConnectionSet. No
-     * data can be read or written from it.
-     */
-    class EventConnection : public Connection
+/**
+ * A connection signalling an event.
+ *
+ * The connection is only useful to signal something to a ConnectionSet. No data
+ * can be read or written from it.
+ */
+class EventConnection : public Connection
+{
+public:
+    CO_API EventConnection();
+    CO_API virtual ~EventConnection();
+
+    CO_API bool connect() override;
+    CO_API void close() override { _close(); }
+    CO_API void set();
+    CO_API void reset();
+
+    CO_API Notifier getNotifier() const override;
+
+protected:
+    void readNB(void*, const uint64_t) override { LBDONTCALL; }
+    int64_t readSync(void*, const uint64_t, const bool) override
     {
-    public:
-        CO_API EventConnection();
-        CO_API virtual ~EventConnection();
+        LBDONTCALL;
+        return -1;
+    }
+    CO_API int64_t write(const void*, const uint64_t) override
+    {
+        LBDONTCALL;
+        return -1;
+    }
 
-        CO_API bool connect() override;
-        CO_API void close() override { _close(); }
-
-        CO_API void set();
-        CO_API void reset();
-
-        CO_API Notifier getNotifier() const override;
-
-    protected:
-        void readNB( void*, const uint64_t ) override
-            { LBDONTCALL; }
-        int64_t readSync( void*, const uint64_t, const bool ) override
-            { LBDONTCALL; return -1; }
-        CO_API int64_t write( const void*, const uint64_t ) override
-            { LBDONTCALL; return -1; }
-
-    private:
+private:
 #ifdef _WIN32
-        void* _event;
+    void* _event;
 #else
-        PipeConnectionPtr _connection;
-        lunchbox::Lock _lock;
-        bool _set;
+    PipeConnectionPtr _connection;
+    std::mutex _lock;
+    bool _set;
 #endif
 
-        Buffer _buffer;
+    Buffer _buffer;
 
-        void _close();
-    };
+    void _close();
+};
 }
 
-#endif //CO_EVENT_CONNECTION_H
+#endif // CO_EVENT_CONNECTION_H

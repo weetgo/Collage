@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2012-2015, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2012-2017, Daniel Nachbaur <danielnachbaur@gmail.com>
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
@@ -22,54 +22,54 @@
 
 #include "buffer.h"
 
-
 namespace co
 {
 namespace detail
 {
-
 class ObjectICommand
 {
 public:
     ObjectICommand()
-        : instanceID( CO_INSTANCE_INVALID )
-    {}
+        : instanceID(CO_INSTANCE_INVALID)
+    {
+    }
 
-    ObjectICommand( const ObjectICommand& rhs )
-        : objectID( rhs.objectID )
-        , instanceID( rhs.instanceID )
-    {}
+    ObjectICommand(const ObjectICommand& rhs)
+        : objectID(rhs.objectID)
+        , instanceID(rhs.instanceID)
+    {
+    }
 
     uint128_t objectID;
     uint32_t instanceID;
 };
 }
 
-ObjectICommand::ObjectICommand( LocalNodePtr local, NodePtr remote,
-                                ConstBufferPtr buffer, const bool swap_ )
-    : ICommand( local, remote, buffer, swap_ )
-    , _impl( new detail::ObjectICommand )
+ObjectICommand::ObjectICommand(LocalNodePtr local, NodePtr remote,
+                               ConstBufferPtr buffer)
+    : ICommand(local, remote, buffer)
+    , _impl(new detail::ObjectICommand)
 {
     _init();
 }
 
-ObjectICommand::ObjectICommand( const ICommand& command )
-    : ICommand( command )
-    , _impl( new detail::ObjectICommand )
+ObjectICommand::ObjectICommand(const ICommand& command)
+    : ICommand(command)
+    , _impl(new detail::ObjectICommand)
 {
     _init();
 }
 
-ObjectICommand::ObjectICommand( const ObjectICommand& rhs )
-    : ICommand( rhs )
-    , _impl( new detail::ObjectICommand( *rhs._impl ))
+ObjectICommand::ObjectICommand(const ObjectICommand& rhs)
+    : ICommand(rhs)
+    , _impl(new detail::ObjectICommand(*rhs._impl))
 {
     _init();
 }
 
 void ObjectICommand::_init()
 {
-    if( isValid( ))
+    if (isValid())
         *this >> _impl->objectID >> _impl->instanceID;
 }
 
@@ -88,15 +88,14 @@ uint32_t ObjectICommand::getInstanceID() const
     return _impl->instanceID;
 }
 
-std::ostream& operator << ( std::ostream& os, const ObjectICommand& command )
+std::ostream& operator<<(std::ostream& os, const ObjectICommand& command)
 {
-    os << static_cast< const ICommand& >( command );
-    if( command.isValid( ))
+    os << static_cast<const ICommand&>(command);
+    if (command.isValid())
     {
-        os << " object " << command.getObjectID()
-           << "." << command.getInstanceID();
+        os << " object " << command.getObjectID() << "."
+           << command.getInstanceID();
     }
     return os;
 }
-
 }

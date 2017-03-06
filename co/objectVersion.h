@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2009-2016, Stefan Eilemann <eile@equalizergraphics.com>
+/* Copyright (c) 2009-2017, Stefan Eilemann <eile@equalizergraphics.com>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -22,20 +22,19 @@
 
 #include <co/api.h>
 #include <co/types.h>
-#include <lunchbox/bitOperation.h>
-#include <lunchbox/stdExt.h>
 #include <iostream>
+#include <lunchbox/bitOperation.h>
 
 namespace co
 {
 /** Special object version values */
-static const uint128_t VERSION_NONE( 0, 0 );
-static const uint128_t VERSION_FIRST( 0, 1 );
-static const uint128_t VERSION_NEWEST( 0, 0xfffffffffffffffbull );
-static const uint128_t VERSION_OLDEST( 0, 0xfffffffffffffffcull );
-static const uint128_t VERSION_NEXT( 0, 0xfffffffffffffffdull );
-static const uint128_t VERSION_INVALID( 0, 0xfffffffffffffffeull );
-static const uint128_t VERSION_HEAD( 0, 0xffffffffffffffffull );
+static const uint128_t VERSION_NONE(0, 0);
+static const uint128_t VERSION_FIRST(0, 1);
+static const uint128_t VERSION_NEWEST(0, 0xfffffffffffffffbull);
+static const uint128_t VERSION_OLDEST(0, 0xfffffffffffffffcull);
+static const uint128_t VERSION_NEXT(0, 0xfffffffffffffffdull);
+static const uint128_t VERSION_INVALID(0, 0xfffffffffffffffeull);
+static const uint128_t VERSION_HEAD(0, 0xffffffffffffffffull);
 
 /**
  * A helper struct bundling an object identifier and version.
@@ -50,94 +49,82 @@ struct ObjectVersion
     CO_API ObjectVersion();
 
     /** Construct a new object version. @version 1.0 */
-    CO_API ObjectVersion( const uint128_t& identifier,
-                          const uint128_t& version );
+    CO_API ObjectVersion(const uint128_t& identifier, const uint128_t& version);
 
     /** Construct a new object version. @version 1.0 */
-    CO_API explicit ObjectVersion( const Object* object );
+    CO_API explicit ObjectVersion(const Object* object);
 
     /** Construct a new object version. @version 1.2 */
-    CO_API explicit ObjectVersion( const Object& object );
+    CO_API explicit ObjectVersion(const Object& object);
 
     /** Construct a new object version. @version 1.0 */
-    template< class R > explicit ObjectVersion( lunchbox::RefPtr< R > object )
-        { *this = object.get(); }
+    template <class R>
+    explicit ObjectVersion(lunchbox::RefPtr<R> object)
+    {
+        *this = object.get();
+    }
 
     /** Assign a new identifier and version. @version 1.0 */
-    CO_API ObjectVersion& operator = ( const Object* object );
+    CO_API ObjectVersion& operator=(const Object* object);
 
     /** @return true if both structs contain the same values. @version 1.0 */
-    bool operator == ( const ObjectVersion& value ) const
+    bool operator==(const ObjectVersion& value) const
     {
-        return ( identifier == value.identifier && version == value.version );
+        return (identifier == value.identifier && version == value.version);
     }
 
     /** @return true if both structs have different values. @version 1.0 */
-    bool operator != ( const ObjectVersion& value ) const
+    bool operator!=(const ObjectVersion& value) const
     {
-        return ( identifier != value.identifier || version != value.version );
+        return (identifier != value.identifier || version != value.version);
     }
 
-    bool operator < ( const ObjectVersion& rhs ) const //!< @internal
+    bool operator<(const ObjectVersion& rhs) const //!< @internal
     {
         return identifier < rhs.identifier ||
-               ( identifier == rhs.identifier && version < rhs.version );
+               (identifier == rhs.identifier && version < rhs.version);
     }
 
-    bool operator > ( const ObjectVersion& rhs ) const //!< @internal
+    bool operator>(const ObjectVersion& rhs) const //!< @internal
     {
         return identifier > rhs.identifier ||
-               ( identifier == rhs.identifier && version > rhs.version );
+               (identifier == rhs.identifier && version > rhs.version);
     }
 
     /** @return true if the identifier and version are set. */
     explicit operator bool() const
-        { return identifier != 0 && version != VERSION_NONE; }
+    {
+        return identifier != 0 && version != VERSION_NONE;
+    }
 
     /** @return true if the identifier or version are not set. */
-    bool operator ! () const
-        { return identifier == 0 || version == VERSION_NONE; }
+    bool operator!() const
+    {
+        return identifier == 0 || version == VERSION_NONE;
+    }
 
     uint128_t identifier; //!< the object identifier
-    uint128_t version; //!< the object version
+    uint128_t version;    //!< the object version
 };
 
-inline std::ostream& operator << (std::ostream& os, const ObjectVersion& ov)
-{ return os << "id " << ov.identifier << " v" << ov.version; }
-}
-
-namespace lunchbox
+inline std::ostream& operator<<(std::ostream& os, const ObjectVersion& ov)
 {
-template<> inline void byteswap( co::ObjectVersion& value ) //!< @internal
-{
-    lunchbox::byteswap( value.identifier );
-    lunchbox::byteswap( value.version );
+    return os << "id " << ov.identifier << " v" << ov.version;
 }
 }
 
-LB_STDEXT_NAMESPACE_OPEN
-#ifdef LB_STDEXT_MSVC
+namespace std
+{
 /** ObjectVersion hash function. */
-template<>
-inline size_t hash_compare< co::ObjectVersion >::operator()
-    ( const co::ObjectVersion& key ) const
+template <>
+struct hash<co::ObjectVersion>
 {
-    const size_t hashVersion = hash_value( key.version );
-    const size_t hashID = hash_value( key.identifier );
-
-    return hash_value( hashVersion ^ hashID );
-}
-#else
-/** ObjectVersion hash function. */
-template<> struct hash< co::ObjectVersion >
-{
-    template< typename P > size_t operator()( const P& key ) const
-        {
-            return hash< uint64_t >()( hash_value( key.version ) ^
-                                       hash_value( key.identifier ));
-        }
+    template <typename P>
+    size_t operator()(const P& key) const
+    {
+        return hash<uint64_t>()(hash_value(key.version) ^
+                                hash_value(key.identifier));
+    }
 };
-#endif
-LB_STDEXT_NAMESPACE_CLOSE
-
+}
 #endif // CO_OBJECT_H

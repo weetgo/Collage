@@ -1,5 +1,17 @@
 # Changelog {#Changelog}
 
+# git master
+
+* [207](https://github.com/Eyescale/Collage/pull/207)
+  Support sending of large payload for OCommands
+* [206](https://github.com/Eyescale/Collage/pull/206)
+  Remove unused big-endian/byteswap support
+
+# Release 1.6 (09-12-2016)
+
+* [192](https://github.com/Eyescale/Collage/pull/192)
+  Add remote launch capability
+
 # Release 1.5 (30-Jul-2016)
 
 * [188](https://github.com/Eyescale/Collage/pull/188)

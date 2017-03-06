@@ -1,7 +1,7 @@
 
-/* Copyright (c) 2010-2013, Stefan Eilemann <eile@eyescale.ch>
- *                    2010, Cedric Stalder  <cedric.stalder@gmail.com>
- *                    2012, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2010-2016, Stefan Eilemann <eile@eyescale.ch>
+ *                          Cedric Stalder  <cedric.stalder@gmail.com>
+ *                          Daniel Nachbaur <danielnachbaur@gmail.com>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -25,19 +25,20 @@
 #include "objectCM.h"
 #include "objectDataOCommand.h"
 
+#include <pression/data/CompressorInfo.h>
+
 namespace co
 {
-ObjectDataOStream::ObjectDataOStream( const ObjectCM* cm )
-        : _cm( cm )
-        , _version( VERSION_INVALID )
-        , _sequence( 0 )
+ObjectDataOStream::ObjectDataOStream(const ObjectCM* cm)
+    : _cm(cm)
+    , _version(VERSION_INVALID)
+    , _sequence(0)
 {
     const Object* object = cm->getObject();
-    const uint32_t name = object->chooseCompressor();
-    _initCompressor( name );
-    LBLOG( LOG_OBJECTS )
-        << "Using byte compressor 0x" << std::hex << name << std::dec << " for "
-        << lunchbox::className( object ) << std::endl;
+    const CompressorInfo& info = object->chooseCompressor();
+    _setCompressor(info);
+    LBLOG(LOG_OBJECTS) << "Using " << info.name << " for "
+                       << lunchbox::className(object) << std::endl;
 }
 
 void ObjectDataOStream::reset()
@@ -47,26 +48,27 @@ void ObjectDataOStream::reset()
     _version = VERSION_INVALID;
 }
 
-void ObjectDataOStream::enableCommit( const uint128_t& version,
-                                      const Nodes& receivers )
+void ObjectDataOStream::enableCommit(const uint128_t& version,
+                                     const Nodes& receivers)
 {
     _version = version;
-    _setupConnections( receivers );
+    _setupConnections(receivers);
     _enable();
 }
 
-ObjectDataOCommand ObjectDataOStream::send(
-    const uint32_t cmd, const uint32_t type, const uint32_t instanceID,
-    const void* data, const uint64_t size, const bool last )
+ObjectDataOCommand ObjectDataOStream::send(const uint32_t cmd,
+                                           const uint32_t type,
+                                           const uint32_t instanceID,
+                                           const void* data,
+                                           const uint64_t size, const bool last)
 {
-    LBASSERT( _version != VERSION_INVALID );
+    LBASSERT(_version != VERSION_INVALID);
     const uint32_t sequence = _sequence++;
-    if( last )
+    if (last)
         _sequence = 0;
 
-    return ObjectDataOCommand( getConnections(), cmd, type,
-                               _cm->getObject()->getID(), instanceID, _version,
-                               sequence, data, size, last, this );
+    return ObjectDataOCommand(getConnections(), cmd, type,
+                              _cm->getObject()->getID(), instanceID, _version,
+                              sequence, data, size, last, this);
 }
-
 }

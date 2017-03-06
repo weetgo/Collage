@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2011-2013, Stefan Eilemann <eile@eyescale.ch>
+/* Copyright (c) 2011-2017, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -23,8 +23,8 @@
 #include <co/connection.h>
 #include <co/node.h>
 #include <co/types.h>
-#include <lunchbox/hash.h>
 
+#include <lunchbox/hash.h>
 #include <set>
 
 namespace co
@@ -40,58 +40,58 @@ namespace co
  * @param nodes the nodes to send to.
  * @param result the connection vector receiving new connections.
  */
-inline Connections gatherConnections( const Nodes& nodes )
+inline Connections gatherConnections(const Nodes& nodes)
 {
     Connections result;
-    typedef stde::hash_map< ConstConnectionDescriptionPtr, NodePtr,
-                           lunchbox::hashRefPtr< const ConnectionDescription > >
+    typedef std::unordered_map<
+        ConstConnectionDescriptionPtr, NodePtr,
+        lunchbox::hashRefPtr<const ConnectionDescription> >
         MCNodes;
     MCNodes mcNodes; // first node using a multicast connection
 
-    typedef std::set< ConstConnectionDescriptionPtr > MCSet;
+    typedef std::set<ConstConnectionDescriptionPtr> MCSet;
     MCSet mcSet; // multicast connection is added
 
-    for( Nodes::const_iterator i = nodes.begin(); i != nodes.end(); ++i )
+    for (Nodes::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
     {
         NodePtr node = *i;
-        ConnectionPtr connection = node->getConnection( true /* preferMC */);
-        LBASSERT( connection );
-        if( !connection )
+        ConnectionPtr connection = node->getConnection(true /* preferMC */);
+        LBASSERT(connection);
+        if (!connection)
             continue;
 
-        if( connection->isMulticast( ))
+        if (connection->isMulticast())
         {
             ConstConnectionDescriptionPtr desc = connection->getDescription();
-            if( mcSet.find( desc ) != mcSet.end( )) // already added
+            if (mcSet.find(desc) != mcSet.end()) // already added
                 continue;
 
-            MCNodes::iterator j = mcNodes.find( desc );
-            if( j == mcNodes.end( ))
+            MCNodes::iterator j = mcNodes.find(desc);
+            if (j == mcNodes.end())
             {
-                 // first appearance of multicast connection
-                mcNodes[ desc ] = node;
+                // first appearance of multicast connection
+                mcNodes[desc] = node;
                 continue;
             }
 
-            mcSet.insert( desc ); // mark as added
-            mcNodes.erase( j );
+            mcSet.insert(desc); // mark as added
+            mcNodes.erase(j);
         }
 
-        result.push_back( connection );
+        result.push_back(connection);
     }
 
     // Add unicast connections for multicast node connections seen only once
-    for( MCNodes::iterator i = mcNodes.begin(); i != mcNodes.end(); ++i )
+    for (MCNodes::iterator i = mcNodes.begin(); i != mcNodes.end(); ++i)
     {
         ConnectionPtr connection = i->second->getConnection();
-        LBASSERT( connection.isValid( ));
+        LBASSERT(connection.isValid());
 
-        if( connection.isValid( ))
-            result.push_back( connection );
+        if (connection.isValid())
+            result.push_back(connection);
     }
     return result;
 }
-
 }
 
-#endif //CO_CONNECTIONS_H
+#endif // CO_CONNECTIONS_H

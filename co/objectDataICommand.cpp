@@ -1,6 +1,6 @@
 
-/* Copyright (c) 2012, Daniel Nachbaur <danielnachbaur@gmail.com>
- *               2012-2013, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2012-2017, Daniel Nachbaur <danielnachbaur@gmail.com>
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Collage <https://github.com/Eyescale/Collage>
  *
@@ -21,63 +21,61 @@
 #include "objectDataICommand.h"
 
 #include "buffer.h"
-#include <pression/plugins/compressorTypes.h>
+#include <pression/data/CompressorInfo.h>
+#include <pression/data/Registry.h>
 
 namespace co
 {
 namespace detail
 {
-
 class ObjectDataICommand
 {
 public:
     ObjectDataICommand()
-        : version( 0, 0 )
-        , datasize( 0 )
-        , sequence( 0 )
-        , compressor( EQ_COMPRESSOR_NONE )
-        , chunks( 1 )
-        , isLast( false )
-    {}
+        : version(0, 0)
+        , datasize(0)
+        , sequence(0)
+        , chunks(1)
+        , isLast(false)
+    {
+    }
 
     uint128_t version;
     uint64_t datasize;
     uint32_t sequence;
-    uint32_t compressor;
+    std::string compressorName;
     uint32_t chunks;
     bool isLast;
 };
-
 }
 
-ObjectDataICommand::ObjectDataICommand( const ICommand& command )
-    : ObjectICommand( command )
-    , _impl( new detail::ObjectDataICommand )
+ObjectDataICommand::ObjectDataICommand(const ICommand& command)
+    : ObjectICommand(command)
+    , _impl(new detail::ObjectDataICommand)
 {
     _init();
 }
 
-ObjectDataICommand::ObjectDataICommand( LocalNodePtr local, NodePtr remote,
-                                      ConstBufferPtr buffer, const bool swap_ )
-    : ObjectICommand( local, remote, buffer, swap_ )
-    , _impl( new detail::ObjectDataICommand )
+ObjectDataICommand::ObjectDataICommand(LocalNodePtr local, NodePtr remote,
+                                       ConstBufferPtr buffer)
+    : ObjectICommand(local, remote, buffer)
+    , _impl(new detail::ObjectDataICommand)
 {
     _init();
 }
 
-
-ObjectDataICommand::ObjectDataICommand( const ObjectDataICommand& rhs )
-    : ObjectICommand( rhs )
-    , _impl( new detail::ObjectDataICommand( *rhs._impl ))
+ObjectDataICommand::ObjectDataICommand(const ObjectDataICommand& rhs)
+    : ObjectICommand(rhs)
+    , _impl(new detail::ObjectDataICommand(*rhs._impl))
 {
     _init();
 }
 
 void ObjectDataICommand::_init()
 {
-    if( isValid( ))
-        *this >> _impl->version >> _impl->datasize >> _impl->sequence
-              >> _impl->isLast >> _impl->compressor >> _impl->chunks;
+    if (isValid())
+        *this >> _impl->version >> _impl->datasize >> _impl->sequence >>
+            _impl->isLast >> _impl->compressorName >> _impl->chunks;
 }
 
 ObjectDataICommand::~ObjectDataICommand()
@@ -100,9 +98,9 @@ uint64_t ObjectDataICommand::getDataSize() const
     return _impl->datasize;
 }
 
-uint32_t ObjectDataICommand::getCompressor() const
+CompressorInfo ObjectDataICommand::getCompressorInfo() const
 {
-    return _impl->compressor;
+    return pression::data::Registry::getInstance().find(_impl->compressorName);
 }
 
 uint32_t ObjectDataICommand::getChunks() const
@@ -115,15 +113,14 @@ bool ObjectDataICommand::isLast() const
     return _impl->isLast;
 }
 
-std::ostream& operator << ( std::ostream& os, const ObjectDataICommand& command )
+std::ostream& operator<<(std::ostream& os, const ObjectDataICommand& command)
 {
-    os << static_cast< const ObjectICommand& >( command );
-    if( command.isValid( ))
+    os << static_cast<const ObjectICommand&>(command);
+    if (command.isValid())
     {
         os << " v" << command.getVersion() << " size " << command.getDataSize()
            << " seq " << command.getSequence() << " last " << command.isLast();
     }
     return os;
 }
-
 }
